@@ -1,0 +1,50 @@
+=== Verbose logging started: 12.07.2022  11:39:02  Build type: SHIP UNICODE 5.00.10011.00  Calling process: C:\Windows\CARIAD\ManagementAgent_setup.exe ===
+MSI (c) (10:30) [11:39:02:590]: SOFTWARE RESTRICTION POLICY: Verifying package --> 'C:\ProgramData\baramundi\bma\install\ManagementAgent.msi' against software restriction policy
+MSI (c) (10:30) [11:39:02:590]: SOFTWARE RESTRICTION POLICY: C:\ProgramData\baramundi\bma\install\ManagementAgent.msi has a digital signature
+MSI (c) (10:30) [11:39:02:590]: SOFTWARE RESTRICTION POLICY: C:\ProgramData\baramundi\bma\install\ManagementAgent.msi is permitted to run because the user token authorizes execution (system or service token).
+MSI (c) (10:30) [11:39:02:658]: Cloaking enabled.
+MSI (c) (10:30) [11:39:02:658]: Attempting to enable all disabled privileges before calling Install on Server
+MSI (c) (10:30) [11:39:02:659]: End dialog not enabled
+MSI (c) (10:30) [11:39:02:660]: Original package ==> C:\ProgramData\baramundi\bma\install\ManagementAgent.msi
+MSI (c) (10:30) [11:39:02:660]: Package we're running from ==> C:\ProgramData\baramundi\bma\install\ManagementAgent.msi
+MSI (c) (10:30) [11:39:02:660]: APPCOMPAT: Uninstall Flags override found.
+MSI (c) (10:30) [11:39:02:660]: APPCOMPAT: Uninstall VersionNT override found.
+MSI (c) (10:30) [11:39:02:660]: APPCOMPAT: Uninstall ServicePackLevel override found.
+MSI (c) (10:30) [11:39:02:660]: APPCOMPAT: looking for appcompat database entry with ProductCode '{7349EC34-9EFF-4B3A-91DD-1960AD0F7451}'.
+MSI (c) (10:30) [11:39:02:660]: APPCOMPAT: no matching ProductCode found in database.
+MSI (c) (10:30) [11:39:02:685]: MSCOREE not loaded loading copy from system32
+MSI (c) (10:30) [11:39:02:685]: Note: 1: 2205 2:  3: MsiFileHash 
+MSI (c) (10:30) [11:39:02:685]: Machine policy value 'DisablePatch' is 0
+MSI (c) (10:30) [11:39:02:685]: Machine policy value 'AllowLockdownPatch' is 0
+MSI (c) (10:30) [11:39:02:685]: Machine policy value 'DisableLUAPatching' is 0
+MSI (c) (10:30) [11:39:02:685]: Machine policy value 'DisableFlyWeightPatching' is 0
+MSI (c) (10:30) [11:39:02:685]: APPCOMPAT: looking for appcompat database entry with ProductCode '{7349EC34-9EFF-4B3A-91DD-1960AD0F7451}'.
+MSI (c) (10:30) [11:39:02:685]: APPCOMPAT: no matching ProductCode found in database.
+MSI (c) (10:30) [11:39:02:685]: Transforms are not secure.
+MSI (c) (10:30) [11:39:02:685]: PROPERTY CHANGE: Adding MsiLogFileLocation property. Its value is 'C:\WINDOWS\TEMP\MSIFACB.tmp.LOG'.
+MSI (c) (10:30) [11:39:02:685]: No Command Line.
+MSI (c) (10:30) [11:39:02:685]: PROPERTY CHANGE: Adding PackageCode property. Its value is '{2C244DBE-57F5-460B-A669-3D5A52F70C28}'.
+MSI (c) (10:30) [11:39:02:685]: Product Code passed to Engine.Initialize:           '(none)'
+MSI (c) (10:30) [11:39:02:685]: Product Code from property table before transforms: '{7349EC34-9EFF-4B3A-91DD-1960AD0F7451}'
+MSI (c) (10:30) [11:39:02:685]: Product Code from property table after transforms:  '{7349EC34-9EFF-4B3A-91DD-1960AD0F7451}'
+MSI (c) (10:30) [11:39:02:685]: Product registered: entering maintenance mode
+MSI (c) (10:30) [11:39:02:685]: Determined that existing product (either this product or the product being upgraded with a patch) is installed per-machine.
+MSI (c) (10:30) [11:39:02:685]: PROPERTY CHANGE: Adding ProductState property. Its value is '5'.
+MSI (c) (10:30) [11:39:02:685]: PROPERTY CHANGE: Adding ProductToBeRegistered property. Its value is '1'.
+MSI (c) (10:30) [11:39:02:685]: Note: 1: 1402 2: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer 3: 2 
+MSI (c) (10:30) [11:39:02:685]: Entering CMsiConfigurationManager::SetLastUsedSource.
+MSI (c) (10:30) [11:39:02:685]: Specifed source is already in a list.
+MSI (c) (10:30) [11:39:02:685]: User policy value 'SearchOrder' is 'nmu'
+MSI (c) (10:30) [11:39:02:685]: Machine policy value 'DisableBrowse' is 0
+MSI (c) (10:30) [11:39:02:685]: Machine policy value 'AllowLockdownBrowse' is 0
+MSI (c) (10:30) [11:39:02:685]: Adding new sources is allowed.
+MSI (c) (10:30) [11:39:02:685]: PROPERTY CHANGE: Adding PackagecodeChanging property. Its value is '1'.
+Eine andere Version des Produkts ist bereits installiert. Die Installation dieser Version kann nicht fortgesetzt werden. Verwenden Sie die Systemsteuerungsoption "Software", um die vorhandene Version dieses Produkts zu konfigurieren oder zu entfernen.
+{7349EC34-9EFF-4B3A-91DD-1960AD0F7451}
+MSI (c) (10:30) [11:39:02:685]: Note: 1: 1729 
+MSI (c) (10:30) [11:39:02:685]: Product: baramundi Management Agent -- Configuration failed.
+
+MSI (c) (10:30) [11:39:02:685]: Windows Installer reconfigured the product. Product Name: baramundi Management Agent. Product Version: 21.2.282.0. Product Language: 1033. Manufacturer: baramundi software AG. Reconfiguration success or error status: 1638.
+
+=== Verbose logging stopped: 12.07.2022  11:39:02 ===
+
