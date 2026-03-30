@@ -6,8 +6,6 @@
 #include <condition_variable>
 #include <iostream>
 #include <fstream>
-#include <locale>
-#include <codecvt>
 #include <future>
 #include <atomic>
 
@@ -71,27 +69,6 @@ struct MyGrep::Data
         }
     }
 
-    void setupFileEncoding(std::wifstream& file) const noexcept
-    {
-        wchar_t bom[2];
-        file.read(bom, 2);
-
-        uint16_t bom_value = (static_cast<uint16_t>(bom[0]) << 8) | bom[1];
-
-        switch (bom_value) {
-        case 0xFEFF: // UTF-16 BE BOM
-            file.imbue(std::locale(file.getloc(), new std::codecvt_utf16<wchar_t, 0x10ffff, std::consume_header>));
-            break;
-        case 0xFFFE: // UTF-16 LE BOM
-            file.imbue(std::locale(file.getloc(), new std::codecvt_utf16<wchar_t, 0x10ffff, static_cast<std::codecvt_mode>(std::consume_header | std::little_endian)>));
-            break;
-        default: // Unsupported BOM, assume other encoding
-            file.clear();
-            file.seekg(0); // Rewind to start
-            break;
-        }
-    }
-
     void setupThreads(std::promise<void>& promise)
     {
         for (size_t i = 0; i < std::thread::hardware_concurrency() - 1; ++i)
@@ -102,16 +79,15 @@ struct MyGrep::Data
 
     void searchInFile(const fs::path& filePath) noexcept
     {
-        std::wifstream file(filePath, std::ios::binary);
+        std::ifstream file(filePath);
 
         if (!file) {
-            m_logger.logError(L"Error opening file: " + filePath.wstring());
+            m_logger.logError("Error opening file: " + filePath.string());
             return;
         }
 
-        setupFileEncoding(file);
-
-        std::wstring line{};
+        // Only UTF-8 files are supported. Future: add encoding policy.
+        std::string line{};
         size_t lineNumber{ 0 };
 
         while (std::getline(file, line))
@@ -132,8 +108,8 @@ struct MyGrep::Data
                 std::unique_lock<std::mutex> lock(m_queueMutex);
                 m_filesQueue.push(entry);
                 ++m_tasksCounter;
-                m_cv.notify_one();
             }
+                m_cv.notify_one();
         }
 
         if (m_tasksCounter == 0)
@@ -142,7 +118,7 @@ struct MyGrep::Data
         }
     }
 
-    std::wstring m_pattern{};
+    std::string m_pattern{};
     fs::path m_path{};
     std::vector<std::thread> m_threads{};
     std::condition_variable m_cv{};
@@ -160,12 +136,12 @@ MyGrep::MyGrep(logger::ILogger& logger)
 
 MyGrep::~MyGrep() = default;
 
-void MyGrep::search(std::filesystem::path path, std::wstring pattern) noexcept
+void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
 {
     
     if (path.empty() || pattern.empty())
     {
-        m_pimpl->m_logger.logError(L"Invalid input, please check path or search pattern.");
+        m_pimpl->m_logger.logError("Invalid input, please check path or search pattern.");
         return;
     }
     m_pimpl->m_pattern.swap(pattern);
@@ -178,7 +154,7 @@ void MyGrep::search(std::filesystem::path path, std::wstring pattern) noexcept
     }
     else if (fs::is_directory(m_pimpl->m_path))
     {
-        m_pimpl->m_logger.logMessage(L"Searching in folder " + m_pimpl->m_path.wstring());
+        m_pimpl->m_logger.logMessage("Searching in folder " + m_pimpl->m_path.string());
 
         std::promise<void> completionPromise{};
         std::future<void> completionFuture = completionPromise.get_future();
@@ -188,7 +164,7 @@ void MyGrep::search(std::filesystem::path path, std::wstring pattern) noexcept
         m_pimpl->searchInDirectory();
 
         completionFuture.get();
-        m_pimpl->m_logger.logMessage(L"Search in folder done");
+        m_pimpl->m_logger.logMessage("Search in folder done");
         {
             std::unique_lock<std::mutex> lock(m_pimpl->m_queueMutex);
             m_pimpl->m_done = true;
@@ -198,9 +174,7 @@ void MyGrep::search(std::filesystem::path path, std::wstring pattern) noexcept
     }
     else
     {
-        m_pimpl->m_logger.logError(L"Invalid provided path " + m_pimpl->m_path.wstring());
+        m_pimpl->m_logger.logError("Invalid provided path " + m_pimpl->m_path.string());
     }
 }
-
-
 }

@@ -1,0 +1,24 @@
+name: Build Workspace
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build project
+        run: mkdir build && cd build && cmake .. && cmake --build .
+
+      - name: Run tests
+        run: cd build && ctest --output-on-failure
