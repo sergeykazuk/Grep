@@ -45,8 +45,10 @@ cmake -DENABLE_TESTS=ON ..
 To use `MyGrep`, run the executable with the following syntax:
 
 ```bash
-./my_grep.exe PATTERN DIRECTORY
+./my_grep.exe [-c] PATTERN DIRECTORY
 ```
+- `-c`, `--color`: Enable colored output.
+- `-h`, `--help`: Show usage help.
 - PATTERN: The string pattern you want to search for.
 - DIRECTORY: The path to the directory or file where the search will be performed.
 
@@ -54,6 +56,17 @@ Example:
 ```bash
 ./my_grep.exe "APPCOMPAT" C:\trac_msi.log
 ```
+
+Colored output example:
+```bash
+./my_grep.exe -c "APP" C:\trac_msi.log
+```
+
+Color output note:
+
+- Colored output is implemented using ANSI escape sequences.
+- It should work in most Unix-like terminals and in modern Windows terminals such as Windows Terminal and recent PowerShell sessions with ANSI support enabled.
+- It may not render correctly in older Windows consoles or environments that do not interpret ANSI color codes.
 
 Note:
 

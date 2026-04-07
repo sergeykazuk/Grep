@@ -1,5 +1,5 @@
 #include "my_grep.hpp"
-#include "ilogger.hpp"
+#include "logger.hpp"
 #include <thread>
 #include <mutex>
 #include <queue>
@@ -15,8 +15,8 @@ namespace fs = std::filesystem;
 
 struct MyGrep::Data
 {
-    Data(logger::ILogger& logger)
-        : m_logger(logger)
+    Data(std::unique_ptr<logger::ILogger> loggerPtr)
+        : m_logger(std::move(loggerPtr))
     {
         m_threads.reserve(std::thread::hardware_concurrency());
     }
@@ -82,7 +82,7 @@ struct MyGrep::Data
         std::ifstream file(filePath);
 
         if (!file) {
-            m_logger.logError("Error opening file: " + filePath.string());
+            m_logger->logError("Error opening file: " + filePath.string());
             return;
         }
 
@@ -95,7 +95,7 @@ struct MyGrep::Data
             ++lineNumber;
             if (line.find(m_pattern) != std::wstring::npos)
             {
-                m_logger.logSearchResult(filePath, lineNumber, line);
+                m_logger->logSearchResult(filePath, lineNumber, line);
             }
         }
     }
@@ -127,11 +127,11 @@ struct MyGrep::Data
     std::queue<fs::path> m_filesQueue{};
     std::atomic<size_t> m_tasksCounter{ 0 };
     std::once_flag m_searchDoneFlag{};
-    logger::ILogger& m_logger;
+    std::unique_ptr<logger::ILogger> m_logger;
 };
 
-MyGrep::MyGrep(logger::ILogger& logger)
-    : m_pimpl(std::make_unique<MyGrep::Data>(logger))
+MyGrep::MyGrep(std::unique_ptr<logger::ILogger> loggerPtr)
+    : m_pimpl(std::make_unique<MyGrep::Data>(std::move(loggerPtr)))
 {}
 
 MyGrep::~MyGrep() = default;
@@ -141,7 +141,7 @@ void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
     
     if (path.empty() || pattern.empty())
     {
-        m_pimpl->m_logger.logError("Invalid input, please check path or search pattern.");
+        m_pimpl->m_logger->logError("Invalid input, please check path or search pattern.");
         return;
     }
     m_pimpl->m_pattern.swap(pattern);
@@ -154,7 +154,7 @@ void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
     }
     else if (fs::is_directory(m_pimpl->m_path))
     {
-        m_pimpl->m_logger.logMessage("Searching in folder " + m_pimpl->m_path.string());
+        m_pimpl->m_logger->logMessage("Searching in folder " + m_pimpl->m_path.string());
 
         std::promise<void> completionPromise{};
         std::future<void> completionFuture = completionPromise.get_future();
@@ -164,7 +164,7 @@ void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
         m_pimpl->searchInDirectory();
 
         completionFuture.get();
-        m_pimpl->m_logger.logMessage("Search in folder done");
+        m_pimpl->m_logger->logMessage("Search in folder done");
         {
             std::unique_lock<std::mutex> lock(m_pimpl->m_queueMutex);
             m_pimpl->m_done = true;
@@ -174,7 +174,7 @@ void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
     }
     else
     {
-        m_pimpl->m_logger.logError("Invalid provided path " + m_pimpl->m_path.string());
+        m_pimpl->m_logger->logError("Invalid provided path " + m_pimpl->m_path.string());
     }
 }
 }

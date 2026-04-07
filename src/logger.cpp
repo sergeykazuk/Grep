@@ -1,20 +1,22 @@
 #include "logger.hpp"
-#include <iostream>
+#include "logging/iloggerbackend.hpp"
 
 namespace my_grep::logger
 {
 
 Logger::Logger()
-    : m_loggingThread([&]() { processQueue(); })
-{}
+    : ILogger()
+    , m_loggingThread([this](){ processQueue(); })
+{
+}
 
 Logger::~Logger()
 {
     {
         std::unique_lock<std::mutex> lock(m_queueMutex);
         m_done = true;
-        m_cv.notify_one();
     }
+    m_cv.notify_one();
 
     if (m_loggingThread.joinable())
     {
@@ -22,64 +24,69 @@ Logger::~Logger()
     }
 }
 
+
 void Logger::logSearchResult(std::filesystem::path filePath, size_t line_num, std::string line)
 {
-    std::unique_lock<std::mutex> lock(m_queueMutex);
-    m_logQueue.push(LogEntry{ EntryType::eSearchResult, std::move(filePath), line_num, std::move(line)});
+    {
+        std::unique_lock<std::mutex> lock(m_queueMutex);
+        m_logQueue.push(LogEntry{ EntryType::eSearchResult, std::move(filePath)
+            , line_num, std::move(line) });
+    }
     m_cv.notify_one();
 }
 
 void Logger::logMessage(std::string message)
 {
-    std::unique_lock<std::mutex> lock(m_queueMutex);
-    m_logQueue.push(LogEntry{ EntryType::eMessage, "", std::string::npos, std::move(message)});
+    {
+        std::unique_lock<std::mutex> lock(m_queueMutex);
+        m_logQueue.push(LogEntry{ EntryType::eMessage, "", std::string::npos
+            , std::move(message) });
+    }
     m_cv.notify_one();
 }
 
 void Logger::logError(std::string message)
 {
-    std::unique_lock<std::mutex> lock(m_queueMutex);
-    m_logQueue.push(LogEntry{ EntryType::eError, "", std::string::npos, std::move(message) });
+    {
+        std::unique_lock<std::mutex> lock(m_queueMutex);
+        m_logQueue.push(LogEntry{ EntryType::eError, "", std::string::npos
+            , std::move(message) });
+    }
     m_cv.notify_one();
+}
+
+void Logger::addLoggerBackend(LoggerBackendPtr_t backendPtr)
+{
+    m_loggerBackends.push_back(std::move(backendPtr));
 }
 
 void Logger::processQueue()
 {
     while (true)
     {
-        std::queue<LogEntry> logQueue{};
+        std::queue<LogEntry> pendingEntries{};
         {
             std::unique_lock<std::mutex> lock(m_queueMutex);
-
-            m_cv.wait(lock, [&]() { return  m_done || !m_logQueue.empty(); });
+            m_cv.wait(lock, [&]() { return m_done || !m_logQueue.empty(); });
 
             if (m_done && m_logQueue.empty())
             {
                 break;
             }
 
-            logQueue.swap(m_logQueue);
+            pendingEntries.swap(m_logQueue);
         }
 
-        while (!logQueue.empty())
+        while (!pendingEntries.empty())
         {
-            const auto& leRef = logQueue.front();
+            const auto& entry = pendingEntries.front();
 
-            switch (leRef.type)
+            for (auto& backend : m_loggerBackends)
             {
-            case EntryType::eSearchResult:
-                std::cout << leRef.file_path << ": " << leRef.line << " > " << leRef.str << "\n";
-                break;
-            case EntryType::eMessage:
-                std::cout << leRef.str << "\n";
-                break;
-            case EntryType::eError:
-                std::cerr << leRef.str << "\n";
-                break;
-            default:
-                std::cerr << "Unknown log entry type\n";
+                backend->write(entry);
             }
-            logQueue.pop();
+
+            pendingEntries.pop();
         }
     }
 }

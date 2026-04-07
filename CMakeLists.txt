@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.20)
 
 project ("my_grep")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -16,6 +16,8 @@ include_directories(${CMAKE_SOURCE_DIR}/includes)
 add_library(my_grep_lib STATIC
     src/my_grep.cpp
     src/logger.cpp
+    src/logging/formatters.cpp
+    src/logging/consolebackend.cpp
 )
 
 add_executable(my_grep src/main.cpp)

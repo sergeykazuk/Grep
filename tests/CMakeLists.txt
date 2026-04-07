@@ -19,7 +19,7 @@ add_executable(my_grep_tests ${TEST_SOURCES})
 
 target_include_directories(my_grep_tests PRIVATE ${CMAKE_SOURCE_DIR}/includes)
 
-target_link_libraries(my_grep_tests PRIVATE my_grep_lib gtest gtest_main gmock gmock_main)
+target_link_libraries(my_grep_tests PRIVATE my_grep_lib gmock_main)
 
 include(GoogleTest)
 gtest_discover_tests(my_grep_tests)

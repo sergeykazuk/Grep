@@ -4,25 +4,23 @@
 #include <filesystem>
 #include <memory>
 
-namespace my_grep
-{
+namespace my_grep {
 
 namespace logger
 {
-struct ILogger;
+class ILogger;
 }
 
-class MyGrep
+class MyGrep final
 {
 public:
     
-    explicit MyGrep(logger::ILogger& logger);
+    explicit MyGrep(std::unique_ptr<logger::ILogger> loggerPtr);
     ~MyGrep();
     MyGrep(const MyGrep&) = delete;
-    MyGrep(MyGrep&&) = default;
+    MyGrep(MyGrep&&) = delete;
     MyGrep& operator=(const MyGrep&) = delete;
-    MyGrep& operator=(MyGrep&&) = default;
-
+    MyGrep& operator=(MyGrep&&) = delete;
 
     void search(std::filesystem::path path, std::string pattern) noexcept;
 
