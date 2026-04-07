@@ -23,33 +23,38 @@ protected:
 
     void SetUp() override
     {
+        auto loggerPtr = std::make_unique<MockLogger>();
+        logger = loggerPtr.get();
+
+        grep = std::make_unique<my_grep::MyGrep>(std::move(loggerPtr));
     }
 
     void TearDown() override 
     {
+        grep.reset();
     }
 
-    std::unique_ptr<MockLogger> logger = std::make_unique<MockLogger>();
-    my_grep::MyGrep grep{ std::move(logger) };
+    MockLogger *logger;
+    std::unique_ptr<my_grep::MyGrep> grep;
 };
 
 
 TEST_F(MyGrepTest, TestEmptyFileSearch)
 {
     EXPECT_CALL(*logger, logSearchResult(_, _, _)).Times(0); 
-    grep.search(fs::path{"./test_data/empty.txt"}, "Test string");
+    grep->search(fs::path{"./tests/test_data/empty.txt"}, "Test string");
 }
 
 TEST_F(MyGrepTest, TestUtf8Search)
 {
     EXPECT_CALL(*logger, logSearchResult(_, _, _)).Times(7); 
-    grep.search(fs::path{ "./test_data/utf8/u8_test.log" }, "APP");
+    grep->search(fs::path{ "./tests/test_data/utf8/u8_test.log" }, "APP");
 }
 
 TEST_F(MyGrepTest, TestUtf8SearchLowerCase)
 {
     EXPECT_CALL(*logger, logSearchResult(_, _, _)).Times(2); 
-    grep.search(fs::path{ "./test_data/utf8/u8_test.log" }, "app");
+    grep->search(fs::path{ "./tests/test_data/utf8/u8_test.log" }, "app");
 }
 
 TEST_F(MyGrepTest, TestFolderSearch)
@@ -57,11 +62,11 @@ TEST_F(MyGrepTest, TestFolderSearch)
     EXPECT_CALL(*logger, logSearchResult(_, _, _)).Times(4); 
     EXPECT_CALL(*logger, logMessage(_)).Times(2);
 
-    grep.search(fs::path{ "./test_data/" }, "app");
+    grep->search(fs::path{ "./tests/test_data/" }, "app");
 }
 
 TEST_F(MyGrepTest, TestFileNotFound)
 {
     EXPECT_CALL(*logger, logError(_)).Times(1);
-    grep.search(fs::path{ "./test_data/definetely_not_there.txt" }, "app");
+    grep->search(fs::path{ "./tests/test_data/definetely_not_there.txt" }, "app");
 }
