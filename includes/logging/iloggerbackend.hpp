@@ -29,7 +29,7 @@ struct ILoggerBackend {
 
 protected:
     std::string_view m_pattern{};
-    LogFormatter m_formatter{defaultLogFormatter};
+    LogFormatter m_formatter = defaultLogFormatter;
 };
 
 }
