@@ -22,4 +22,4 @@ target_include_directories(my_grep_tests PRIVATE ${CMAKE_SOURCE_DIR}/includes)
 target_link_libraries(my_grep_tests PRIVATE my_grep_lib gmock_main)
 
 include(GoogleTest)
-gtest_discover_tests(my_grep_tests)
+gtest_discover_tests(my_grep_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
