@@ -10,7 +10,7 @@
 
 ## Prerequisites
 
-- C++17
+- C++20
 - CMake 3.10 or higher
 
 ## Building
@@ -33,10 +33,37 @@
     ```bash
     cmake --build .
     ```
+
+To enable `clang-tidy` during the build, configure CMake with:
+
+```bash
+cmake -DENABLE_CLANG_TIDY=ON ..
+```
+
 Unit tests will not be built by default. If you want to build them either change ENABLE_TESTS flag to ON, or path it on CMake call as follow:
     
 ```bash
 cmake -DENABLE_TESTS=ON ..
+```
+
+## Tooling
+
+- `.clang-format` provides consistent formatting for C++ sources.
+- `.clang-tidy` enables a focused set of correctness and maintainability checks.
+- `ENABLE_CLANG_TIDY=ON` keeps static analysis opt-in, so normal builds stay fast.
+
+## Git Hooks
+
+The repository includes sample hooks under `.githooks/`:
+
+- `pre-commit`: runs `clang-format` on staged C++ files.
+- `pre-push`: builds the project and runs the test binary if it exists.
+
+To use them:
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit .githooks/pre-push
 ```
 
 

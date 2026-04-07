@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+set -eu
+
+if ! command -v git >/dev/null 2>&1; then
+    exit 0
+fi
+
+if ! command -v clang-format >/dev/null 2>&1; then
+    echo "clang-format not found; skipping formatting hook."
+    exit 0
+fi
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(cpp|hpp|cc|cxx|h)$' || true)
+
+if [ -z "$staged_files" ]; then
+    exit 0
+fi
+
+for file in $staged_files; do
+    if [ -f "$file" ]; then
+        clang-format -i "$file"
+        git add "$file"
+    fi
+done

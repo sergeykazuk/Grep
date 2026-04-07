@@ -1,33 +1,34 @@
-﻿#include <filesystem>
+﻿#include "logger.hpp"
+#include "logging/consolebackend.hpp"
+#include "my_grep.hpp"
+#include <filesystem>
 #include <iostream>
 #include <string>
 #include <string_view>
-#include "my_grep.hpp"
-#include "logger.hpp"
-#include "logging/consolebackend.hpp"
 
-namespace {
+namespace
+{
 
 void printUsage(std::string_view executableName)
 {
     std::cout << "Usage: " << executableName << " [-c] PATTERN DIRECTORY\n"
-        << "  -c, --color  Enable colored output\n"
-        << "  -h, --help   Show this help message\n";
+              << "  -c, --color  Enable colored output\n"
+              << "  -h, --help   Show this help message\n";
 }
 
-}
+} // namespace
 
 int main(int argc, char* argv[])
 {
     namespace fs = std::filesystem;
 
-    bool enableColor{ false };
+    bool enableColor{false};
     std::string pattern{};
     fs::path path{};
 
     for (int index = 1; index < argc; ++index)
     {
-        const std::string_view argument{ argv[index] };
+        const std::string_view argument{argv[index]};
 
         if (argument == "-h" || argument == "--help")
         {
@@ -56,7 +57,7 @@ int main(int argc, char* argv[])
 
         if (path.empty())
         {
-            path = fs::path{ argument };
+            path = fs::path{argument};
             continue;
         }
 
@@ -75,13 +76,13 @@ int main(int argc, char* argv[])
 
     namespace ml = my_grep::logger;
     auto loggerInstance = std::make_unique<ml::Logger>();
-    
+
     {
         auto consoleBackend = std::make_unique<ml::ConsoleBackend>(enableColor);
         consoleBackend->setSearchPattern(pattern);
         loggerInstance->addLoggerBackend(std::move(consoleBackend));
     }
 
-    my_grep::MyGrep grep{ std::move(loggerInstance) };
+    my_grep::MyGrep grep{std::move(loggerInstance)};
     grep.search(std::move(path), std::move(pattern));
 }

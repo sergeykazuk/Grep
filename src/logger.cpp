@@ -4,11 +4,10 @@
 namespace my_grep::logger
 {
 
-Logger::Logger()
+Logger::Logger() 
     : ILogger()
-    , m_loggingThread([this](){ processQueue(); })
-{
-}
+    , m_loggingThread([this]() { processQueue(); }) 
+{}
 
 Logger::~Logger()
 {
@@ -24,13 +23,12 @@ Logger::~Logger()
     }
 }
 
-
 void Logger::logSearchResult(std::filesystem::path filePath, size_t line_num, std::string line)
 {
     {
         std::unique_lock<std::mutex> lock(m_queueMutex);
-        m_logQueue.push(LogEntry{ EntryType::eSearchResult, std::move(filePath)
-            , line_num, std::move(line) });
+        m_logQueue.push(
+            LogEntry{EntryType::eSearchResult, std::move(filePath), line_num, std::move(line)});
     }
     m_cv.notify_one();
 }
@@ -39,8 +37,7 @@ void Logger::logMessage(std::string message)
 {
     {
         std::unique_lock<std::mutex> lock(m_queueMutex);
-        m_logQueue.push(LogEntry{ EntryType::eMessage, "", std::string::npos
-            , std::move(message) });
+        m_logQueue.push(LogEntry{EntryType::eMessage, "", std::string::npos, std::move(message)});
     }
     m_cv.notify_one();
 }
@@ -49,8 +46,7 @@ void Logger::logError(std::string message)
 {
     {
         std::unique_lock<std::mutex> lock(m_queueMutex);
-        m_logQueue.push(LogEntry{ EntryType::eError, "", std::string::npos
-            , std::move(message) });
+        m_logQueue.push(LogEntry{EntryType::eError, "", std::string::npos, std::move(message)});
     }
     m_cv.notify_one();
 }
@@ -91,4 +87,4 @@ void Logger::processQueue()
     }
 }
 
-}
+} // namespace my_grep::logger

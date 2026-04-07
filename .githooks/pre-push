@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+set -eu
+
+repo_root=$(git rev-parse --show-toplevel)
+build_dir="$repo_root/build"
+
+if [ ! -d "$build_dir" ]; then
+    echo "No build directory found at $build_dir; skipping pre-push checks."
+    exit 0
+fi
+
+cmake --build "$build_dir"
+
+if [ -x "$build_dir/tests/my_grep_tests" ]; then
+    "$build_dir/tests/my_grep_tests"
+fi

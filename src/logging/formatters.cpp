@@ -2,15 +2,15 @@
 #include "logging/log_entry.hpp"
 #include <format>
 
-namespace my_grep::logger {
+namespace my_grep::logger
+{
 
 std::string defaultLogFormatter(const LogEntry& entry, std::string_view)
 {
     switch (entry.type)
     {
     case EntryType::eSearchResult:
-        return std::format("{}: {} > {}", entry.file_path.string()
-            , entry.line, entry.str);
+        return std::format("{}: {} > {}", entry.file_path.string(), entry.line, entry.str);
     case EntryType::eMessage:
     case EntryType::eError:
         return entry.str;
@@ -41,4 +41,4 @@ std::string colorLogFormatter(const LogEntry& entry, std::string_view pattern)
     return result;
 }
 
-}
+} // namespace my_grep::logger

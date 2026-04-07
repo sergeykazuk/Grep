@@ -1,13 +1,13 @@
 #include "my_grep.hpp"
 #include "logger.hpp"
-#include <thread>
-#include <mutex>
-#include <queue>
+#include <atomic>
 #include <condition_variable>
-#include <iostream>
 #include <fstream>
 #include <future>
-#include <atomic>
+#include <iostream>
+#include <mutex>
+#include <queue>
+#include <thread>
 
 namespace my_grep
 {
@@ -15,8 +15,7 @@ namespace fs = std::filesystem;
 
 struct MyGrep::Data
 {
-    Data(std::unique_ptr<logger::ILogger> loggerPtr)
-        : m_logger(std::move(loggerPtr))
+    Data(std::unique_ptr<logger::ILogger> loggerPtr) : m_logger(std::move(loggerPtr))
     {
         m_threads.reserve(std::thread::hardware_concurrency());
     }
@@ -37,7 +36,6 @@ struct MyGrep::Data
                 thr.join();
             }
         }
-
     }
 
     void worker(std::promise<void>& promise)
@@ -81,14 +79,15 @@ struct MyGrep::Data
     {
         std::ifstream file(filePath);
 
-        if (!file) {
+        if (!file)
+        {
             m_logger->logError("Error opening file: " + filePath.string());
             return;
         }
 
         // Only UTF-8 files are supported. Future: add encoding policy.
         std::string line{};
-        size_t lineNumber{ 0 };
+        size_t lineNumber{0};
 
         while (std::getline(file, line))
         {
@@ -104,12 +103,13 @@ struct MyGrep::Data
     {
         for (const auto& entry : fs::recursive_directory_iterator(m_path))
         {
-            if (entry.is_regular_file()) {
+            if (entry.is_regular_file())
+            {
                 std::unique_lock<std::mutex> lock(m_queueMutex);
                 m_filesQueue.push(entry);
                 ++m_tasksCounter;
             }
-                m_cv.notify_one();
+            m_cv.notify_one();
         }
 
         if (m_tasksCounter == 0)
@@ -123,22 +123,23 @@ struct MyGrep::Data
     std::vector<std::thread> m_threads{};
     std::condition_variable m_cv{};
     std::mutex m_queueMutex{};
-    bool m_done{ false };
+    bool m_done{false};
     std::queue<fs::path> m_filesQueue{};
-    std::atomic<size_t> m_tasksCounter{ 0 };
+    std::atomic<size_t> m_tasksCounter{0};
     std::once_flag m_searchDoneFlag{};
     std::unique_ptr<logger::ILogger> m_logger;
 };
 
 MyGrep::MyGrep(std::unique_ptr<logger::ILogger> loggerPtr)
     : m_pimpl(std::make_unique<MyGrep::Data>(std::move(loggerPtr)))
-{}
+{
+}
 
 MyGrep::~MyGrep() = default;
 
 void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
 {
-    
+
     if (path.empty() || pattern.empty())
     {
         m_pimpl->m_logger->logError("Invalid input, please check path or search pattern.");
@@ -159,7 +160,6 @@ void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
         std::promise<void> completionPromise{};
         std::future<void> completionFuture = completionPromise.get_future();
 
-
         m_pimpl->setupThreads(completionPromise);
         m_pimpl->searchInDirectory();
 
@@ -170,11 +170,10 @@ void MyGrep::search(std::filesystem::path path, std::string pattern) noexcept
             m_pimpl->m_done = true;
             m_pimpl->m_cv.notify_all();
         }
-
     }
     else
     {
         m_pimpl->m_logger->logError("Invalid provided path " + m_pimpl->m_path.string());
     }
 }
-}
+} // namespace my_grep

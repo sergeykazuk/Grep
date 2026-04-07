@@ -1,10 +1,11 @@
 ﻿#pragma once
 
-#include <string>
 #include <filesystem>
 #include <memory>
+#include <string>
 
-namespace my_grep {
+namespace my_grep
+{
 
 namespace logger
 {
@@ -13,8 +14,7 @@ class ILogger;
 
 class MyGrep final
 {
-public:
-    
+  public:
     explicit MyGrep(std::unique_ptr<logger::ILogger> loggerPtr);
     ~MyGrep();
     MyGrep(const MyGrep&) = delete;
@@ -24,10 +24,9 @@ public:
 
     void search(std::filesystem::path path, std::string pattern) noexcept;
 
-private:
+  private:
     struct Data;
     std::unique_ptr<Data> m_pimpl{};
 };
 
-
-}
+} // namespace my_grep
