@@ -34,11 +34,11 @@ class Logger final : public ILogger
 
   private:
     std::queue<LogEntry> m_logQueue{};
-    std::thread m_loggingThread{};
     std::mutex m_queueMutex{};
     std::condition_variable m_cv{};
     bool m_done{false};
     std::vector<LoggerBackendPtr_t> m_loggerBackends{};
+    std::thread m_loggingThread{};
 
   private:
     void processQueue();

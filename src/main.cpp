@@ -1,5 +1,6 @@
 ﻿#include "logger.hpp"
 #include "logging/consolebackend.hpp"
+#include "logging/textfilebackend.hpp"
 #include "my_grep.hpp"
 #include <filesystem>
 #include <iostream>
@@ -11,9 +12,22 @@ namespace
 
 void printUsage(std::string_view executableName)
 {
-    std::cout << "Usage: " << executableName << " [-c] PATTERN DIRECTORY\n"
+    std::cout << "Usage: " << executableName << " [-c] [-f=fileName] PATTERN DIRECTORY\n"
               << "  -c, --color  Enable colored output\n"
+              << "  -f=fileName  Write search results to a file placed next to the searched file\n"
+              << "               or inside the searched directory\n"
               << "  -h, --help   Show this help message\n";
+}
+
+std::filesystem::path resolveOutputPath(const std::filesystem::path& searchTarget,
+                                        const std::filesystem::path& outputFileName)
+{
+    if (std::filesystem::is_directory(searchTarget))
+    {
+        return searchTarget / outputFileName;
+    }
+
+    return searchTarget.parent_path() / outputFileName;
 }
 
 } // namespace
@@ -23,6 +37,7 @@ int main(int argc, char* argv[])
     namespace fs = std::filesystem;
 
     bool enableColor{false};
+    std::filesystem::path outputFileName{};
     std::string pattern{};
     fs::path path{};
 
@@ -39,6 +54,21 @@ int main(int argc, char* argv[])
         if (argument == "-c" || argument == "--color")
         {
             enableColor = true;
+            continue;
+        }
+
+        if (argument.starts_with("-f="))
+        {
+            const auto delimiterPos = argument.find('=');
+            outputFileName = fs::path{argument.substr(delimiterPos + 1)};
+
+            if (outputFileName.empty() || outputFileName.has_parent_path())
+            {
+                std::cerr << "-f expects a file name only, e.g. -f=SearchResults.txt"
+                          << std::endl;
+                return 1;
+            }
+
             continue;
         }
 
@@ -81,6 +111,14 @@ int main(int argc, char* argv[])
         auto consoleBackend = std::make_unique<ml::ConsoleBackend>(enableColor);
         consoleBackend->setSearchPattern(pattern);
         loggerInstance->addLoggerBackend(std::move(consoleBackend));
+    }
+
+    if (!outputFileName.empty())
+    {
+        auto outputPath = resolveOutputPath(path, outputFileName);
+        auto fileBackend = std::make_unique<ml::TextFileBackend>(std::move(outputPath));
+        fileBackend->setSearchPattern(pattern);
+        loggerInstance->addLoggerBackend(std::move(fileBackend));
     }
 
     my_grep::MyGrep grep{std::move(loggerInstance)};

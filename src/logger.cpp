@@ -6,8 +6,9 @@ namespace my_grep::logger
 
 Logger::Logger() 
     : ILogger()
-    , m_loggingThread([this]() { processQueue(); }) 
-{}
+{
+    m_loggingThread = std::thread([this]() { processQueue(); });
+}
 
 Logger::~Logger()
 {

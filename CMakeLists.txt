@@ -28,6 +28,7 @@ add_library(my_grep_lib STATIC
     src/logger.cpp
     src/logging/formatters.cpp
     src/logging/consolebackend.cpp
+    src/logging/textfilebackend.cpp
 )
 
 add_executable(my_grep src/main.cpp)

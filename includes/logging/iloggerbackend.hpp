@@ -31,7 +31,7 @@ struct ILoggerBackend
     }
 
   protected:
-    std::string_view m_pattern{};
+    std::string m_pattern;
     LogFormatter m_formatter = defaultLogFormatter;
 };
 

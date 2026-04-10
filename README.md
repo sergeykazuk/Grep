@@ -72,12 +72,21 @@ chmod +x .githooks/pre-commit .githooks/pre-push
 To use `MyGrep`, run the executable with the following syntax:
 
 ```bash
-./my_grep.exe [-c] PATTERN DIRECTORY
+./my_grep.exe [-c] [-f=fileName] PATTERN DIRECTORY
 ```
 - `-c`, `--color`: Enable colored output.
+- `-f=fileName`: Write search results to a file.
 - `-h`, `--help`: Show usage help.
 - PATTERN: The string pattern you want to search for.
 - DIRECTORY: The path to the directory or file where the search will be performed.
+
+If `-f=fileName` is provided:
+
+- when searching in a file, the results file is created next to the searched file
+- when searching in a directory, the results file is created inside that directory
+- only a file name is accepted for now; nested and absolute paths are rejected
+- if the file already exists, it is overwritten
+- the output file contains a timestamp, the searched pattern, and all emitted search results/messages
 
 Example:
 ```bash
@@ -87,6 +96,16 @@ Example:
 Colored output example:
 ```bash
 ./my_grep.exe -c "APP" C:\trac_msi.log
+```
+
+File output example:
+```bash
+./my_grep.exe -f=SearchResults.txt "APP" C:\trac_msi.log
+```
+
+Directory search with file output:
+```bash
+./my_grep.exe -f=SearchResults.txt "APP" C:\logs
 ```
 
 Color output note:

@@ -10,10 +10,11 @@ std::string defaultLogFormatter(const LogEntry& entry, std::string_view)
     switch (entry.type)
     {
     case EntryType::eSearchResult:
-        return std::format("{}: {} > {}", entry.file_path.string(), entry.line, entry.str);
+        return std::format("{}:{} >> {}", entry.file_path.string(), entry.line, entry.str);
     case EntryType::eMessage:
+        return std::format("I: {}", entry.str);
     case EntryType::eError:
-        return entry.str;
+        return std::format("E: {}", entry.str);
     default:
         return "Unknown log entry type";
     }
