@@ -22,8 +22,7 @@ class ILogger
     ILogger& operator=(const ILogger&) = default;
     ILogger& operator=(ILogger&&) noexcept = default;
 
-    virtual void logSearchResult(std::filesystem::path filePath, size_t line_num,
-                                 std::string line) = 0;
+    virtual void logSearchResult(size_t pathId, size_t line_num, std::string line) = 0;
     virtual void logMessage(std::string message) = 0;
     virtual void logError(std::string message) = 0;
     virtual void addLoggerBackend(LoggerBackendPtr_t backendPtr) = 0;

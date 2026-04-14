@@ -7,6 +7,8 @@
 namespace my_grep
 {
 
+class PathsTracker;
+
 namespace logger
 {
 class ILogger;
@@ -15,7 +17,7 @@ class ILogger;
 class MyGrep final
 {
   public:
-    explicit MyGrep(std::unique_ptr<logger::ILogger> loggerPtr);
+    MyGrep(std::unique_ptr<logger::ILogger> loggerPtr, std::shared_ptr<PathsTracker> tracker);
     ~MyGrep();
     MyGrep(const MyGrep&) = delete;
     MyGrep(MyGrep&&) = delete;

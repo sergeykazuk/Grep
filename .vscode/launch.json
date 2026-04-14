@@ -1,0 +1,58 @@
+
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug my_grep (color + file output)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/my_grep",
+      "args": [
+        "-c",
+        "-f=${input:outputFileName}",
+        "${input:pattern}",
+        "${input:targetPath}"
+      ],
+      "cwd": "${workspaceFolder}/build",
+      "stopAtEntry": false,
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    },
+    {
+      "name": "Debug my_grep (basic)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/my_grep",
+      "args": [
+        "${input:pattern}",
+        "${input:targetPath}"
+      ],
+      "cwd": "${workspaceFolder}/build",
+      "stopAtEntry": false,
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "pattern",
+      "type": "promptString",
+      "description": "Search pattern",
+      "default": "app"
+    },
+    {
+      "id": "targetPath",
+      "type": "promptString",
+      "description": "Target file or directory path (relative to build)",
+      "default": "../tests/test_data/utf8/u8_test.log"
+    },
+    {
+      "id": "outputFileName",
+      "type": "promptString",
+      "description": "Output file name for -f",
+      "default": "res.txt"
+    }
+  ]
+}

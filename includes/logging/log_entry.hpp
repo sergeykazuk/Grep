@@ -19,7 +19,7 @@ enum class EntryType : uint8_t
 struct LogEntry
 {
     EntryType type{EntryType::eSearchResult};
-    std::filesystem::path file_path{};
+    std::string_view path_string{};
     size_t line{std::string::npos};
     std::string str{};
 };

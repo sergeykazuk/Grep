@@ -26,6 +26,7 @@ include_directories(${CMAKE_SOURCE_DIR}/includes)
 add_library(my_grep_lib STATIC
     src/my_grep.cpp
     src/logger.cpp
+    src/paths_tracker.cpp
     src/logging/formatters.cpp
     src/logging/consolebackend.cpp
     src/logging/textfilebackend.cpp

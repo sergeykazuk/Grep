@@ -4,8 +4,9 @@
 namespace my_grep::logger
 {
 
-Logger::Logger() 
+Logger::Logger(std::shared_ptr<PathsTracker> tracker) 
     : ILogger()
+    , m_tracker(std::move(tracker))
 {
     m_loggingThread = std::thread([this]() { processQueue(); });
 }
@@ -24,12 +25,13 @@ Logger::~Logger()
     }
 }
 
-void Logger::logSearchResult(std::filesystem::path filePath, size_t line_num, std::string line)
+void Logger::logSearchResult(PathsTracker::PathId_t pathId, size_t line_num, std::string line)
 {
+    auto path = m_tracker->getPathStringForId(pathId);
     {
         std::unique_lock<std::mutex> lock(m_queueMutex);
         m_logQueue.push(
-            LogEntry{EntryType::eSearchResult, std::move(filePath), line_num, std::move(line)});
+            LogEntry{EntryType::eSearchResult, path, line_num, std::move(line)});
     }
     m_cv.notify_one();
 }

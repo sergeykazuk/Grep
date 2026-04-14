@@ -1,5 +1,6 @@
 #include "my_grep.hpp"
 #include "logger.hpp"
+#include "paths_tracker.hpp"
 #include <atomic>
 #include <condition_variable>
 #include <fstream>
@@ -15,7 +16,9 @@ namespace fs = std::filesystem;
 
 struct MyGrep::Data
 {
-    Data(std::unique_ptr<logger::ILogger> loggerPtr) : m_logger(std::move(loggerPtr))
+    Data(std::unique_ptr<logger::ILogger> loggerPtr, std::shared_ptr<PathsTracker> tracker) 
+    : m_logger(std::move(loggerPtr))
+    , m_tracker(std::move(tracker))
     {
         m_threads.reserve(std::thread::hardware_concurrency());
     }
@@ -84,6 +87,7 @@ struct MyGrep::Data
             m_logger->logError("Error opening file: " + filePath.string());
             return;
         }
+        auto pathId = m_tracker->createPathId(filePath);
 
         // Only UTF-8 files are supported. Future: add encoding policy.
         std::string line{};
@@ -94,7 +98,7 @@ struct MyGrep::Data
             ++lineNumber;
             if (line.find(m_pattern) != std::wstring::npos)
             {
-                m_logger->logSearchResult(filePath, lineNumber, line);
+                m_logger->logSearchResult(pathId, lineNumber, line);
             }
         }
     }
@@ -128,10 +132,11 @@ struct MyGrep::Data
     std::atomic<size_t> m_tasksCounter{0};
     std::once_flag m_searchDoneFlag{};
     std::unique_ptr<logger::ILogger> m_logger;
+    std::shared_ptr<PathsTracker> m_tracker;
 };
 
-MyGrep::MyGrep(std::unique_ptr<logger::ILogger> loggerPtr)
-    : m_pimpl(std::make_unique<MyGrep::Data>(std::move(loggerPtr)))
+MyGrep::MyGrep(std::unique_ptr<logger::ILogger> loggerPtr, std::shared_ptr<PathsTracker> tracker)
+    : m_pimpl(std::make_unique<MyGrep::Data>(std::move(loggerPtr), std::move(tracker)))
 {
 }
 

@@ -39,7 +39,7 @@ void TextFileBackend::dumpResultsToFile()
     while (!m_toLog.empty())
     {
         const auto& front = m_toLog.front();
-        out_file << defaultLogFormatter(front, m_pattern);
+        out_file << defaultLogFormatter(front, m_pattern) << std::endl;
 
         m_toLog.pop();
     }

@@ -1,4 +1,5 @@
 ﻿#include "logger.hpp"
+#include "paths_tracker.hpp"
 #include "logging/consolebackend.hpp"
 #include "logging/textfilebackend.hpp"
 #include "my_grep.hpp"
@@ -104,8 +105,10 @@ int main(int argc, char* argv[])
 
     std::cout << "Will search for '" << pattern << "' in " << path << std::endl;
 
+    auto tracker = std::make_shared<my_grep::PathsTracker>();
+
     namespace ml = my_grep::logger;
-    auto loggerInstance = std::make_unique<ml::Logger>();
+    auto loggerInstance = std::make_unique<ml::Logger>(tracker);
 
     {
         auto consoleBackend = std::make_unique<ml::ConsoleBackend>(enableColor);
@@ -121,6 +124,6 @@ int main(int argc, char* argv[])
         loggerInstance->addLoggerBackend(std::move(fileBackend));
     }
 
-    my_grep::MyGrep grep{std::move(loggerInstance)};
+    my_grep::MyGrep grep{std::move(loggerInstance), std::move(tracker)};
     grep.search(std::move(path), std::move(pattern));
 }
