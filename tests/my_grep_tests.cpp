@@ -1,5 +1,6 @@
 #include "logger.hpp"
 #include "my_grep.hpp"
+#include "paths_tracker.hpp"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -10,7 +11,7 @@ using ::testing::Return;
 class MockLogger : public my_grep::logger::ILogger
 {
   public:
-    MOCK_METHOD(void, logSearchResult, (std::filesystem::path, size_t, std::string), (override));
+    MOCK_METHOD(void, logSearchResult, (size_t, size_t, std::string), (override));
     MOCK_METHOD(void, logMessage, (std::string), (override));
     MOCK_METHOD(void, logError, (std::string), (override));
     MOCK_METHOD(void, addLoggerBackend, (ILogger::LoggerBackendPtr_t), (override));
@@ -23,8 +24,9 @@ class MyGrepTest : public ::testing::Test
     {
         auto loggerPtr = std::make_unique<MockLogger>();
         logger = loggerPtr.get();
+        auto tracker = std::make_shared<my_grep::PathsTracker>();
 
-        grep = std::make_unique<my_grep::MyGrep>(std::move(loggerPtr));
+        grep = std::make_unique<my_grep::MyGrep>(std::move(loggerPtr), std::move(tracker));
     }
 
     void TearDown() override
